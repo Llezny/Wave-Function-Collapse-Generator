@@ -1,0 +1,18 @@
+{
+    "name": "WaveFunctionCollapseGeneratorTests",
+    "rootNamespace": "WaveFunctionCollapseGeneratorTests",
+    "references": [
+        "GUID:58f1d6f057af88d4691c539596bba663"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
