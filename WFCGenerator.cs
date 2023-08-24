@@ -10,14 +10,16 @@ namespace WaveFunctionCollapseGenerator {
         private int cellsToCollapse;
         private Cell[] grid;
 
-        private readonly List<BlockData> availableBlockOnThisMap;
+        private readonly MapConfigurationSO config;
+        private readonly List<BlockData> availableBlockOnThisMap = new();
 
-        public WFCGenerator( List<BlockData> availableBlocksOnThisMap, int gridEdgeSize ) {
+        public WFCGenerator( MapConfigurationSO config, int gridEdgeSize ) {
             this.gridEdgeSize = gridEdgeSize;
             this.gridSize = gridEdgeSize * gridEdgeSize;
             this.grid = new Cell[ gridSize ];
-            this.availableBlockOnThisMap = availableBlocksOnThisMap;
-            Prewarm( );
+            this.availableBlockOnThisMap = new( );
+            this.config = config;
+            CacheData( );
         }
 
         public Cell[] Generate( ) {
@@ -48,14 +50,25 @@ namespace WaveFunctionCollapseGenerator {
             neighbourCell = new Cell(  );
             return false;
         }
-
-        private void Prewarm( ) {
+        
+        private void CacheData( ) {
+            CacheAvailableBlocks( );
+            CacheCellsData( );
+        }
+        
+        private void CacheCellsData( ) {
             for ( int i = 0; i < gridEdgeSize; i++ ) {
                 for ( int j = 0; j < gridEdgeSize; j++ ) {
                     var index = i * gridEdgeSize + j;
                     grid[ index ].AvailableBlocks = new WeightedList<BlockData>(availableBlockOnThisMap);
                     grid[ index ].CacheNeighbourIndexes( index, gridEdgeSize );
                 }
+            }
+        }
+
+        private void CacheAvailableBlocks( ) {
+            foreach ( var availableBlockSO in config.AvailableBlocksOnMap ) {
+                availableBlockOnThisMap.Add( availableBlockSO.BlockData  );
             }
         }
 
