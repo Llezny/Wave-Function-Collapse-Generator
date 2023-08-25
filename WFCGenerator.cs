@@ -11,19 +11,18 @@ namespace WaveFunctionCollapseGenerator {
         private Cell[] grid;
 
         private readonly MapConfigurationSO config;
-        private readonly List<BlockData> availableBlockOnThisMap = new();
+        private readonly List<BlockData> availableBlockOnThisMap;
 
         public WFCGenerator( MapConfigurationSO config, int gridEdgeSize ) {
             this.gridEdgeSize = gridEdgeSize;
             this.gridSize = gridEdgeSize * gridEdgeSize;
-            this.grid = new Cell[ gridSize ];
             this.availableBlockOnThisMap = new( );
             this.config = config;
-            CacheData( );
+            CacheAvailableBlocks( );
         }
 
         public Cell[] Generate( ) {
-            cellsToCollapse = gridSize;
+            Init( );
             while ( cellsToCollapse >= 0 ) {
                 var index = FindLowestEntropyIndex( );
                 Collapse( ref grid[ index ] );
@@ -50,9 +49,10 @@ namespace WaveFunctionCollapseGenerator {
             neighbourCell = new Cell(  );
             return false;
         }
-        
-        private void CacheData( ) {
-            CacheAvailableBlocks( );
+
+        private void Init( ) {
+            this.grid = new Cell[ gridSize ];
+            cellsToCollapse = gridSize;
             CacheCellsData( );
         }
         
