@@ -69,6 +69,7 @@ namespace WaveFunctionCollapseGenerator {
         private void CacheAvailableBlocks( ) {
             foreach ( var availableBlockSO in config.AvailableBlocksOnMap ) {
                 availableBlockOnThisMap.Add( availableBlockSO.BlockData  );
+                GenerateRotatedBlocks( availableBlockSO );
             }
         }
 
@@ -105,6 +106,24 @@ namespace WaveFunctionCollapseGenerator {
             UpdateNeighbourWeights( collapsedBlockIndex, collapsedBlock, Direction.South );
             UpdateNeighbourWeights( collapsedBlockIndex, collapsedBlock, Direction.East );
             UpdateNeighbourWeights( collapsedBlockIndex, collapsedBlock, Direction.West );
+        }
+
+        private void GenerateRotatedBlocks( BlockDataSO block ) {
+            int max = ( int )RotationAmount.Right270Degrees;
+            for ( int i = 1; i <= max; i*=2 ) {
+                if ( block.BlockRotations.HasFlag( ( RotationAmount )i ) ) {
+                    var newBlock = new BlockData( block.BlockData );
+                    RotateBlock( newBlock , i );
+                    availableBlockOnThisMap.Add( newBlock );
+                }
+            }
+        }
+        
+        public static BlockData RotateBlock( BlockData blockToRotate, int rotationFactor ) {
+            for ( int i = 0; i < rotationFactor; i++ ) {
+                blockToRotate.Rotate90Degrees(  );
+            }
+            return blockToRotate;
         }
 
         private void UpdateNeighbourWeights( int collapsedCellIndex, BlockData collapsedBlock, Vector2Int neighbourDirection ) {
