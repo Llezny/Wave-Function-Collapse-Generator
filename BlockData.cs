@@ -12,6 +12,7 @@ namespace WaveFunctionCollapseGenerator {
     [ Serializable ]
     public class BlockData {
         [ field: SerializeField ] public GameObject Block { get; private set; }
+        [ field: SerializeField ] public BlockType BlockType { get; private set; }
 
         [ field: SerializeField ] public List<Socket> SocketsTop { get; private set; }
         [ field: SerializeField ] public List<Socket> SocketsBottom { get; private set; }

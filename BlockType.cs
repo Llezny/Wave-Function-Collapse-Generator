@@ -1,9 +1,11 @@
 ﻿namespace WaveFunctionCollapseGenerator {
-    public enum SocketType {
+    public enum BlockType {
         Earth,
         Grass,
         Tree,
         Sand,
         Stone,
+        Dirt,
+        CaveEntry,
     }
 }

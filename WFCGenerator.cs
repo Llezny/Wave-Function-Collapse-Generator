@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using UnityEngine;
 
@@ -29,16 +30,6 @@ namespace WaveFunctionCollapseGenerator {
                 AdjustNeighbours( index );
             }
             return grid;
-        }
-        
-        public static List<Socket> GetMatchingSockets( List<Socket> adjacentToCollapsedBlockSocket, List<Socket> adjacentToNeighbourSocket ) {
-            List<Socket> matchingSockets = new( );
-            foreach ( var socket in adjacentToCollapsedBlockSocket ) {
-                if ( adjacentToNeighbourSocket.Contains( socket ) ) {
-                    matchingSockets.Add( socket );
-                }
-            }
-            return matchingSockets;
         }
 
         public bool TryGetNeighbourCell( int currentCellIndex, Vector2Int neighbourDirection, out Cell neighbourCell ) {
@@ -102,10 +93,10 @@ namespace WaveFunctionCollapseGenerator {
                 return;
             }
             var collapsedBlock = grid[ collapsedBlockIndex ].AvailableBlocks[ 0 ];
-            UpdateNeighbourWeights( collapsedBlockIndex, collapsedBlock, Direction.North );
-            UpdateNeighbourWeights( collapsedBlockIndex, collapsedBlock, Direction.South );
-            UpdateNeighbourWeights( collapsedBlockIndex, collapsedBlock, Direction.East );
-            UpdateNeighbourWeights( collapsedBlockIndex, collapsedBlock, Direction.West );
+            UpdateNeighbours( collapsedBlockIndex, collapsedBlock, Direction.North );
+            UpdateNeighbours( collapsedBlockIndex, collapsedBlock, Direction.South );
+            UpdateNeighbours( collapsedBlockIndex, collapsedBlock, Direction.East );
+            UpdateNeighbours( collapsedBlockIndex, collapsedBlock, Direction.West );
         }
 
         private void GenerateRotatedBlocks( BlockDataSO block ) {
@@ -126,7 +117,7 @@ namespace WaveFunctionCollapseGenerator {
             return blockToRotate;
         }
 
-        private void UpdateNeighbourWeights( int collapsedCellIndex, BlockData collapsedBlock, Vector2Int neighbourDirection ) {
+        private void UpdateNeighbours( int collapsedCellIndex, BlockData collapsedBlock, Vector2Int neighbourDirection ) {
             if ( !TryGetNeighbourCell( collapsedCellIndex, neighbourDirection, out var neighbourCell ) || neighbourCell.IsCollapsed ) {
                 return;
             }
@@ -135,16 +126,18 @@ namespace WaveFunctionCollapseGenerator {
             
             for ( int i = neighbourCell.AvailableBlocks.Count - 1; i >= 0; i-- ) {
                 var availableNeighbourBlock = neighbourCell.AvailableBlocks[ i ];
-                var adjacentToCollapsedBlockSocket = availableNeighbourBlock.GetSocketByDirection( -neighbourDirection ) ;
-
-                var matchingSockets = GetMatchingSockets( adjacentToCollapsedBlockSocket, adjacentToNeighbourSocket );
-                if ( matchingSockets.IsNullOrEmpty( ) ) {
+                var compatibleSocket = adjacentToNeighbourSocket.Find( socket => socket.blockType == availableNeighbourBlock.BlockType );
+                
+                if ( compatibleSocket == null ) {
                     neighbourCell.AvailableBlocks.RemoveAt( i );
-                    return;
+                    continue;
                 }
-                foreach ( var socket in matchingSockets ) {
-                    neighbourCell.AvailableBlocks.AddWeightToItem( collapsedBlock, socket.Weight  );
-                }
+               
+                neighbourCell.AvailableBlocks.AddWeightToItem( availableNeighbourBlock, compatibleSocket.Weight  );
+            }
+
+            if ( Debug.isDebugBuild && neighbourCell.AvailableBlocks.Count == 0 ) {
+                Debug.LogWarning( $"No available blocks for #{ collapsedCellIndex } cell, with neighbour: {collapsedBlock.BlockType}" );
             }
         }
     }
