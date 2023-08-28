@@ -7,7 +7,7 @@ namespace WaveFunctionCollapseGenerator {
     public class Socket : IEquatable<Socket>{
         public BlockType blockType;
 
-        [ Range( 0, 10 ) ]
+        [ Range( 1, 100 ) ]
         public int Weight;
 
         public bool Equals( Socket other ) {
